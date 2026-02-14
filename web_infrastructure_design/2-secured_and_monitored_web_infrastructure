@@ -1,0 +1,33 @@
+User (Browser)
+  |
+  | 1) DNS: www.foobar.com -> LB Public IP
+  | 2) HTTPS request (TLS)
+  v
+ [Firewall #1]
+  |
+  v
++--------------------------------------+
+| Load Balancer (HAProxy)              |
+| - Terminates SSL (has cert)          |
+| - Routes traffic to backend servers  |
+| - Health checks                      |
+| - Monitoring client (agent)          |
++--------------------------------------+
+                 | (internal network)
+         -------------------------
+         |                       |
+     [Firewall #2]           [Firewall #3]
+         |                       |
+         v                       v
++----------------------+   +----------------------+
+| App Server #1        |   | App Server #2        |
+| - Nginx              |   | - Nginx              |
+| - Application server |   | - Application server |
+| - App files          |   | - App files          |
+| - MySQL (Replica)    |   | - MySQL (Primary)    |
+| - Monitoring agent   |   | - Monitoring agent   |
++----------------------+   +----------------------+
+            ^                        |
+            |   MySQL replication    |
+            +------------------------+
+         (Primary -> Replica)
